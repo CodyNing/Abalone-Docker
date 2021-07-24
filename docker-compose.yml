@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  # rabbitmq:
+  #   image: rabbitmq:3
+  #   environment:
+  #   - RABBITMQ_DEFAULT_USER=guest
+  #   - RABBITMQ_DEFAULT_PASS=guest
+  #   ports:
+  #     - "127.0.0.1:5672:5672"
+  gamebackend:
+    image: gamebackend
+    build:
+      context: .
+      dockerfile: GameBackend/Dockerfile
+    environment: 
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+:443;http://+:80
+      SERVER_CONNECT_URI: tcp://gameagent:5555
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    ports:
+      - "8443:443"
+      - "8888:80"
+  gameagent:
+   image: gameagent
+   build:
+     context: GameAgent/.
+     dockerfile: Dockerfile
+   environment: 
+    SERVER_LISTEN_URI: tcp://0.0.0.0:5555
