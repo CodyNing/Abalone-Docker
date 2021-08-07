@@ -4,7 +4,14 @@ project(GameAgent)
 
 find_package(cppzmq)
 
-add_executable(GameAgent main.cpp)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+
+file(GLOB GameAgent_SRC
+     "src/*.h"
+     "src/*.cpp" 
+)
+
+add_executable(GameAgent ${GameAgent_SRC})
 target_link_libraries(GameAgent cppzmq)
 set_property(TARGET GameAgent PROPERTY CXX_STANDARD 17)
 

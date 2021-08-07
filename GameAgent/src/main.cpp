@@ -2,12 +2,15 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include "automata.h"
+#include "util.h"
 
 #include <zmq.hpp>
 
 int main() 
 {
-    using namespace std::chrono_literals;
+//    using namespace std::chrono_literals;
+    using namespace std;
 
     // initialize the zmq context with a single IO thread
     zmq::context_t context{1};
@@ -16,22 +19,22 @@ int main()
     zmq::socket_t socket{context, zmq::socket_type::rep};
     socket.bind("tcp://0.0.0.0:5555");
 
-    // prepare some static data for responses
-    const std::string data{"World"};
-
     for (;;) 
     {
         zmq::message_t request;
+        automata ai = automata{};
 
-        // receive a request from client
         socket.recv(request, zmq::recv_flags::none);
-        std::cout << "Received " << request.to_string() << std::endl;
+        string requestStr = request.to_string();
 
-        // simulate work
-        std::this_thread::sleep_for(1s);
+        std::cout << "Received " << requestStr << std::endl;
+
+        auto res = util::route(requestStr, ai);
+
+        std::cout << res << std::endl;
 
         // send the reply to the client
-        socket.send(zmq::buffer(data), zmq::send_flags::none);
+        socket.send(zmq::buffer(res), zmq::send_flags::none);
     }
 
     return 0;
