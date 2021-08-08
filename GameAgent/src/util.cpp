@@ -57,7 +57,7 @@ std::string util::getAINextMove(automata & ai, const std::string& stateStr, bool
     auto bitState = stringState2BitState(stateStr);
 
     auto wam = ai.getBestMove(bitState, isBlackTurn, moveLeft, timeLeft);
-    std::cout << printState(logic::b2b(wam.state)) << std::endl;
+//    std::cout << printState(logic::b2b(wam.state)) << std::endl;
     return logic::b2b(wam.state).to_string();
 }
 

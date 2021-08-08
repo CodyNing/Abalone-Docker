@@ -24,14 +24,14 @@ int main()
         zmq::message_t request;
         automata ai = automata{};
 
-        socket.recv(request, zmq::recv_flags::none);
+        auto recv_res = socket.recv(request, zmq::recv_flags::none);
         string requestStr = request.to_string();
 
-        std::cout << "Received " << requestStr << std::endl;
+//        std::cout << "Received " << requestStr << std::endl;
 
         auto res = util::route(requestStr, ai);
 
-        std::cout << res << std::endl;
+//        std::cout << res << std::endl;
 
         // send the reply to the client
         socket.send(zmq::buffer(res), zmq::send_flags::none);

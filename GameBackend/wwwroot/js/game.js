@@ -644,9 +644,9 @@ class Game {
                 Game.game = await Game.newGame();
             });
 
-            $('game_finish_modal_close_btn').on('click', async e=>{
-                $('#game_finish_modal').modal('hide');
-            })
+            // $('game_finish_modal_close_btn').on('click', async e=>{
+            //     $('#game_finish_modal').modal('hide');
+            // })
 
             $('#game_finish_modal').modal({
                 backdrop: 'static',

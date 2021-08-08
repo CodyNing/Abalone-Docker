@@ -48,11 +48,11 @@ logic::weightedActionState automata::alphaBeta(logic::bitState & state, bool isB
 		lastLayerUsed = getElapsedMilliseconds(startTime) - miliSec;
 		miliSec += lastLayerUsed;
 
-		std::cout << "Depth: " << depth << std::endl;
-		std::cout << "Time used: " << lastLayerUsed << std::endl;
-		std::cout << "Searched state: " << counter << std::endl;
-		std::cout << "bestV: " << bestV << std::endl;
-		std::cout << "Best Action: " << best.act.act.count << " " << best.act.act.direction << " " << best.act.act.index << std::endl;
+//		std::cout << "Depth: " << depth << std::endl;
+//		std::cout << "Time used: " << lastLayerUsed << std::endl;
+//		std::cout << "Searched state: " << counter << std::endl;
+//		std::cout << "bestV: " << bestV << std::endl;
+//		std::cout << "Best Action: " << best.act.act.count << " " << best.act.act.direction << " " << best.act.act.index << std::endl;
 
 		++depth;
 	} while (depth < moveLeft && timeLeft - miliSec >(lastLayerUsed << 3));
@@ -102,7 +102,7 @@ automata::maxTopReturn automata::maxTop(std::multiset<logic::weightedActionState
 		// if (!cv.wait_for(blockLck, std::chrono::milliseconds{ timeLeft - clock.getElapsedTime().asMilliseconds() }, [&threadRemain] {return threadRemain > 0; })) {
 		if (!cv.wait_for(blockLck, std::chrono::milliseconds{timeLeft - getElapsedMilliseconds(startTime) }, [&threadRemain] {return threadRemain > 0; })) {
 			std::unique_lock<std::mutex> lck{ mtQ };
-			std::cout << "<timeout>" << std::endl;
+//			std::cout << "<timeout>" << std::endl;
 			returned = true;
 			return { bestAs, bestV, false };
 		}
@@ -113,14 +113,14 @@ automata::maxTopReturn automata::maxTop(std::multiset<logic::weightedActionState
 	if (!cv.wait_for(blockLck, std::chrono::milliseconds{timeLeft - getElapsedMilliseconds(startTime) },
 		[&completedBranch, &actionStates] {return completedBranch == actionStates.size(); })) {
 		std::unique_lock<std::mutex> lck{ mtQ };
-		std::cout << "<timeout>" << std::endl;
+//		std::cout << "<timeout>" << std::endl;
 		returned = true;
 		return { bestAs, bestV, false };
 	}
 
 
 	std::unique_lock<std::mutex> lck{ mtQ };
-	std::cout << "<completed>" << std::endl;
+//	std::cout << "<completed>" << std::endl;
 	returned = true;
 
 	return { bestAs, bestV, true };
