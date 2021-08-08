@@ -62,7 +62,8 @@ namespace GameBackend.Models
             PAUSED = 1 << 1,
             AI_SEARCHING = 1 << 2,
             BLACK_WINNED = 1 << 3,
-            WHITE_WINNED = 1 << 4
+            WHITE_WINNED = 1 << 4,
+            DRAW = 1 << 5
         }
 
         public enum InitialState
@@ -76,6 +77,8 @@ namespace GameBackend.Models
         public string IPAddress { get; set; }
         public GameState State { get; set; }
         public ReadableState BoardState { get; set; }
+        public bool IsBlackTurn { get; set; }
+        public List<ValidMove> ValidMoves { get; set; }
         public int AITimeSec { get; set; }
         public int MoveLeft { get; set; }
         public DateTime InitTime { get; set; }
@@ -104,6 +107,8 @@ namespace GameBackend.Models
                     break;
             }
             State = GameState.HUMAN_THINKING;
+            IsBlackTurn = true;
+            GetValidMoves();
             InitTime = DateTime.Now;
             LastUpdatedTime = DateTime.Now;
             SessionId = Guid.NewGuid();
@@ -129,5 +134,102 @@ namespace GameBackend.Models
 
             Games[game.SessionId] = game;
         }
+
+        public void GetValidMoves()
+        {
+            var agentstate = GameUtil.TranslateState(BoardState);
+            var requestStr = $"GetValidMoves\n{agentstate.State},{IsBlackTurn}";
+            var agentRes = AgentRequester.GetInstance().Send(requestStr);
+            var lines = agentRes.Split('\n');
+            ValidMoves = new List<ValidMove>(lines.Length);
+            foreach (var line in lines)
+            {
+                var actState = line.Split(":");
+                if (actState.Length != 2)
+                {
+                    throw new Exception("Unable to parse agent respond");
+                }
+                var aact = new AgentAction(actState[0]);
+                var astate = new AgentState(actState[1]);
+                ReadableState nstate;
+                ReadableAction nact;
+                GameUtil.TranslateAction(aact, astate, BoardState, out nact, out nstate);
+                var move = new ValidMove(nact, nstate);
+                ValidMoves.Add(move);
+            }
+        }
+
+        public void HumanMove(ValidMove move)
+        {
+            LastUpdatedTime = DateTime.Now;
+            BoardState = move.State;
+            IsBlackTurn = false;
+            if (HasGameFinished())
+            {
+                FinishGame();
+            }
+            else
+            { 
+                State = GameState.AI_SEARCHING;
+                AIMove();
+                GetValidMoves();
+            }
+        }
+
+        public void AIMove()
+        {
+            var agentstate = GameUtil.TranslateState(BoardState);
+            var requestStr = $"GetAINextMove\n{agentstate.State},{IsBlackTurn},{MoveLeft},{AITimeSec}";
+            var agentRes = AgentRequester.GetInstance().Send(requestStr);
+            var nstate = GameUtil.TranslateState(new AgentState(agentRes));
+            BoardState = nstate;
+            IsBlackTurn = true;
+            --MoveLeft;
+            if (HasGameFinished())
+            {
+                FinishGame();
+            }
+            else
+            {
+                State = GameState.HUMAN_THINKING;
+            }
+        }
+
+        public bool HasGameFinished()
+        {
+            return BoardState.BlackScore >= 6 || BoardState.WhiteScore >= 6 || MoveLeft <= 0;
+        }
+
+        public void FinishGame()
+        {
+            if(MoveLeft == 0)
+            {
+                if(BoardState.BlackScore == BoardState.WhiteScore)
+                {
+                    State = GameState.DRAW;
+                } 
+                else if(BoardState.BlackScore > BoardState.WhiteScore)
+                {
+                    State = GameState.BLACK_WINNED;
+                }
+                else
+                {
+                    State = GameState.WHITE_WINNED;
+                }
+            }
+            else
+            {
+                if(BoardState.BlackScore >= 6)
+                {
+                    State = GameState.BLACK_WINNED;
+                }
+                else
+                {
+                    State = GameState.WHITE_WINNED;
+                }
+            }
+            Games.Remove(SessionId);
+        }
+
     }
 }

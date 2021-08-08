@@ -33,8 +33,7 @@ namespace GameBackend.Controllers
         public IActionResult GetGame([FromBody] object body)
         {
             var args = JsonConvert.DeserializeObject<GetGameArgs>(body.ToString());
-            Game game = null;
-            var sucess = Game.Games.TryGetValue(args.SessionId, out game);
+            var sucess = Game.Games.TryGetValue(args.SessionId, out Game game);
             if (sucess)
             {
                 return Json(game);
@@ -61,14 +60,22 @@ namespace GameBackend.Controllers
             }
         }
 
-        //[HttpPost]
-        //[Route("CreateGame")]
-        //public IActionResult Move([FromBody] object body)
-        //{
-        //    var args = JsonConvert.DeserializeObject<CreateGameArgs>(body.ToString());
-        //    var game = new Game(Request.Host.Host, args.InitState, args.AITimeSec, args.MoveLeft);
-        //    return Json(game);
-        //}
+        [HttpPost]
+        [Route("[controller]/Move")]
+        public IActionResult Move([FromBody] object body)
+        {
+            var args = JsonConvert.DeserializeObject<MoveArgs>(body.ToString());
+            var sucess = Game.Games.TryGetValue(args.SessionId, out Game game);
+            if (sucess)
+            {
+                game.HumanMove(args.Move);
+                return Json(game);
+            }
+            else
+            {
+                return StatusCode(410);
+            }
+        }
 
         [HttpPost]
         [Route("[controller]/GetValidMoves")]

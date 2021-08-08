@@ -13,6 +13,8 @@ namespace GameBackend
 
         private static AgentRequester Instance = null;
 
+        private static readonly object myLock = new object();
+
         private readonly RequestSocket Requester;
 
         public static AgentRequester GetInstance()
@@ -31,8 +33,11 @@ namespace GameBackend
 
         public string Send(string message)
         {
-            Requester.SendFrame(message);
-            return Requester.ReceiveFrameString();
+            lock (myLock)
+            {
+                Requester.SendFrame(message);
+                return Requester.ReceiveFrameString();
+            }
         }
     }
 }

@@ -159,7 +159,12 @@ namespace GameBackend
 			int slotIndex = 0;
 			for (; slotIndex < 61; ++slotIndex)
 			{
-				string slotstate = Convert.ToString((int)state.SlotStates[slotIndex], 2).PadLeft(2, '0');
+				var val = (int)state.SlotStates[slotIndex];
+				if (val != 0)
+                {
+					val = (int)state.SlotStates[slotIndex] ^ 3;
+                }
+				string slotstate = Convert.ToString(val, 2).PadLeft(2, '0');
 				stateStr = slotstate + stateStr;
 			}
 			string blackScore = Convert.ToString(state.BlackScore, 2).PadLeft(3, '0');
@@ -175,7 +180,7 @@ namespace GameBackend
 			for (; slotIndex < 61; ++slotIndex)
 			{
 				int i = 127 - (slotIndex << 1);
-				int slotstate = Convert.ToInt32(state.State.Substring(i - 1, 2), 2);
+				int slotstate = Convert.ToInt32($"{state.State.Substring(i, 1)}{state.State.Substring(i - 1, 1)}", 2);
 				readableState.SlotStates[slotIndex] = (ReadableState.SlotState)slotstate;
 			}
 			readableState.BlackScore = Convert.ToInt32(state.State.Substring(0, 3), 2);

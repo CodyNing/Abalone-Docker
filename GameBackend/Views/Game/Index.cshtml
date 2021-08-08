@@ -4,8 +4,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <div>
-    <nav class="navbar navbar-light bg-light">
-        <div class="mr-auto">
+    <nav class="navbar fixed-top">
+        <div id='terminate_btn_div' class='ml-auto'>
+            <button id="terminate_btn" type="button" class="btn btn-danger">Terminate</button>
+        </div>
+    </nav>
+    <nav class="navbar navbar-my">
+        <div id='info-board' class='mx-auto'>
             <span class="">
                 - White Score:
             </span>
@@ -25,15 +30,12 @@
                 0
             </span>
         </div>
-        <div class="ml-auto">
-            <button id="terminate_btn" type="button" class="btn btn-danger">Terminate</button>
-        </div>
     </nav>
 </div>
 <div id="game_board_container">
 
 </div>
-
+@* Adapted from boostrap example: https://getbootstrap.com/docs/4.0/components/modal/ *@
 <div class="modal fade" id="create_game_modal" tabindex="-1" role="dialog" aria-labelledby="createGameModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -53,7 +55,7 @@
                     </div>
                     <div class="form-row" id="init-state">
                         <div class="form-check form-column">
-                            <image class="form-selection-image" src=@Href("~/img/standard.png") />
+                            <img class="form-selection-image" src=@Href("~/img/standard.png") />
                             <div class="form-row">
                                 <div>
                                     <input class="form-check-input" type="radio" value="1" name="init_state_radio" id="init_state_radio1" checked>
@@ -66,7 +68,7 @@
                             </div>
                         </div>
                         <div class="form-check form-column">
-                            <image class="form-selection-image" src=@Href("~/img/german_daisy.png") />
+                            <img class="form-selection-image" src=@Href("~/img/german_daisy.png") />
                             <div class="form-row">
                                 <div>
                                     <input class="form-check-input" type="radio" value="2"  name="init_state_radio" id="init_state_radio2">
@@ -79,7 +81,7 @@
                             </div>
                         </div>
                         <div class="form-check form-column">
-                            <image class="form-selection-image" src=@Href("~/img/belgian_daisy.png") />
+                            <img class="form-selection-image" src=@Href("~/img/belgian_daisy.png") />
                             <div class="form-row">
                                 <div>
                                     <input class="form-check-input" type="radio" value="3"  name="init_state_radio" id="init_state_radio3">
@@ -123,4 +125,26 @@
             </div>
         </div>
     </div>
+</div>
+
+<div id='ai_search_text_container'>
+    <div id='ai_search_text' class="blinking">
+        <span>AI Searching...</span>
+    </div>
+</div>
+
+<div class="modal" id="game_finish_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Game Finished</h5>
+      </div>
+      <div class="modal-body">
+        <p id="game_result_text"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id='game_finish_modal_close_btn'>Close</button>
+      </div>
+    </div>
+  </div>
 </div>

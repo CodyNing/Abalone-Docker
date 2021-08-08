@@ -86,14 +86,14 @@ std::string util::route(const std::string& requestStr, automata & ai){
         if(args.size() != 2){
             return "Failed";
         } else{
-            return getAllValidMovesStr(args[0], args[1] == "true");
+            return getAllValidMovesStr(args[0], args[1] == "True");
         }
 
     } else if(funcName == "GetAINextMove"){
         if(args.size() != 4){
             return "Failed";
         } else{
-            return getAINextMove(ai, args[0], args[1] == "true", std::stoi(args[2]), std::stoi(args[3]));
+            return getAINextMove(ai, args[0], args[1] == "True", std::stoi(args[2]), std::stoi(args[3]));
         }
     }
     return "Invalid path";
